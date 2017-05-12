@@ -168,8 +168,8 @@ class DefaultCredentialsProvider {
       }
     }
 
-    // Then try App Engine
-    if (credentials == null) {
+    // Then try App Engine, if not bypassed
+    if (credentials == null && !isAppEngineCheckByPassed()) {
       credentials = tryGetAppEngineCredential();
     }
 
@@ -263,6 +263,17 @@ class DefaultCredentialsProvider {
       return new ComputeEngineCredentials(transportFactory);
     }
     return null;
+  }
+
+  // Bypass app engine check if environment variable
+  // GOOGLE_APPLICATION_CREDENTIALS_SKIP_APP_ENGINE = 1 or true
+  private boolean isAppEngineCheckByPassed() {
+    boolean bypass = false; // do not bypass by default
+    String value = getEnv("GOOGLE_APPLICATION_CREDENTIALS_SKIP_APP_ENGINE");
+    if (value != null) {
+      bypass = value.equalsIgnoreCase("true") || value.equals("1");
+    }
+    return bypass;
   }
 
   /*

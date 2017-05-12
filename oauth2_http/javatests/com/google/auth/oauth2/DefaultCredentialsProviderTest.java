@@ -213,6 +213,20 @@ public class DefaultCredentialsProviderTest {
   }
 
   @Test
+  public void getDefaultCredentials_appEngineClass_byPassWorks_retrievesCloudShellCredential()
+      throws IOException {
+    MockHttpTransportFactory transportFactory = new MockHttpTransportFactory();
+    TestDefaultCredentialsProvider testProvider = new TestDefaultCredentialsProvider();
+    testProvider.addType(DefaultCredentialsProvider.APP_ENGINE_SIGNAL_CLASS,
+        MockOffAppEngineSystemProperty.class);
+    testProvider.setEnv("DEVSHELL_CLIENT_PORT","9090");
+    testProvider.setEnv("GOOGLE_APPLICATION_CREDENTIALS_SKIP_APP_ENGINE", "true");
+    GoogleCredentials credentials = testProvider.getDefaultCredentials(transportFactory);
+    assertNotNull(credentials);
+    assertTrue(credentials instanceof CloudShellCredentials);
+  }
+
+  @Test
   public void getDefaultCredentials_compute_providesToken() throws IOException {
     MockMetadataServerTransportFactory transportFactory = new MockMetadataServerTransportFactory();
     transportFactory.transport.setAccessToken(ACCESS_TOKEN);
